@@ -1,5 +1,6 @@
 import os
 import requests
+from scraping import Scraper
 from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
@@ -15,10 +16,9 @@ class FlightSearchEngine:
             # should add more
         }
 
-    def search_flights(self, origin, destination, date):
+    def search_flights(self, origin, destination, start_date, end_date):
         results = []
-        results.extend(self._search_skyscanner(origin, destination, date))
-        results.extend(self._search_kayak(origin, destination, date))
+        
         # add more API searches
         return sorted(results, key=lambda x: x['price'])
     
@@ -33,6 +33,6 @@ class FlightSearchEngine:
 
 def main():
     search_engine = FlightSearchEngine()
-    best_flights = search_engine.search_flights("NYC", "LON", datetime(2024, 8, 1))
+    best_flights = search_engine.search_flights("nyca", "lon", "20240811", "20240818")
     for flight in best_flights:
         print(f"Airline: {flight['airline']}, Price: {flight['price']}")
