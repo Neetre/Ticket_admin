@@ -3,7 +3,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver import ActionChains
+from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
 import time
 
@@ -29,27 +29,32 @@ class Scraper:
     def solve_captcha(self):
         try:
             # Wait for the CAPTCHA button to be clickable
-            captcha_button = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "button[class*='hold-button']"))
-            )
-
-            # Create an ActionChains object
-            actions = ActionChains(self.driver)
+            captcha_button = self.driver.find_element_by_xpath("//div[@id='px-captcha']")
+            # Create ActionChains objects
+            action = ActionChains(self.driver)
+            click = ActionChains(self.driver)
 
             # Click and hold the button
-            actions.click_and_hold(captcha_button)
-            actions.perform()
+            action.click_and_hold(captcha_button)
+            action.perform()
 
-            # Wait for the button to be fully filled (adjust time as needed)
-            time.sleep(5)  # You might need to adjust this value
+            # Wait for the button to be fully filled
+            time.sleep(10)
 
             # Release the button
-            actions.release()
-            actions.perform()
+            action.release(captcha_button)
+            action.perform()
+
+            # Small pause
+            time.sleep(0.2)
+
+            # Release again (this might help in some cases)
+            action.release(captcha_button)
+            action.perform()
 
             # Wait for the CAPTCHA to be solved and page to load
-            WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='flight-card']"))
+            WebDriverWait(self.driver, 15).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".FlightsTicket_container__MTI1N"))
             )
             print("CAPTCHA solved successfully!")
         except Exception as e:
@@ -65,17 +70,16 @@ class Scraper:
 
         try:
             WebDriverWait(self.driver, 30).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "[data-testid='flight-card']"))
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".FlightsTicket_container__MTI1N"))
             )
         except:
-            # If CAPTCHA or other challenge is present, you might need manual intervention
             print("Flight results did not load in time. Please check the page manually.")
             input("Press Enter after verifying the page has loaded...")
 
         last_height = self.driver.execute_script("return document.body.scrollHeight")
         while True:
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(2)  # Wait for page to load
+            time.sleep(3)  # Wait for page to load
             new_height = self.driver.execute_script("return document.body.scrollHeight")
             if new_height == last_height:
                 break
@@ -87,11 +91,11 @@ class Scraper:
         soup = BeautifulSoup(data, 'html.parser')
         
         flights = []
-        for flight in soup.select("[data-testid='flight-card']"):
-            price = flight.select_one("[data-testid='price']").text
-            airline = flight.select_one("[data-testid='airline']").text
+        for flight in soup.select(".FlightsTicket_container__MTI1N"):
+            price = flight.select_one(".BpkText_bpk-text__ODgwN.BpkText_bpk-text--lg__ZTY1M").text
+            airline = flight.select_one(".BpkText_bpk-text__ODgwN.BpkText_bpk-text--xs__MWRhZ").text
             flights.append({
-                'price': float(price.replace('$', '').replace(',', '')),
+                'price': float(price.replace('$', '').replace('€', '').replace(',', '')),
                 'airline': airline.strip()
             })
         
