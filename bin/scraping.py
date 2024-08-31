@@ -25,7 +25,7 @@ class Scraper:
         self.chrome_options.add_experimental_option('useAutomationExtension', False)
         self.chrome_options.add_argument(f"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
         self.driver = webdriver.Chrome(options=self.chrome_options)
-        
+
     def solve_captcha(self):
         try:
             # Wait for the CAPTCHA button to be clickable
@@ -113,10 +113,18 @@ class Scraper:
 
 
 def main():
+    from_ = input("Enter origin: ")
+    to = input("Enter destination: ")
+    start_date = input("Enter start date (YYYYMMDD): ")
+    end_date = input("Enter end date (YYYYMMDD): ")
     scraper = Scraper(URL)
-    data = scraper.search("nyca", "lon", "240811", "240818")
-    for flight in data[:5]:
-        print(f"Airline: {flight['airline']}, Price: ${flight['price']:.2f}")
+    try:
+        data = scraper.search(from_, to, start_date, end_date)
+        for flight in data[:5]:
+            print(f"Airline: {flight['airline']}, Price: ${flight['price']:.2f}")
+    except Exception as e:
+        print(f"Error while getting info from flight broker: {e}")
+
 
 if __name__ == "__main__":
     main()
