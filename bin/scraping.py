@@ -34,32 +34,25 @@ class Scraper:
             action = ActionChains(self.driver)
             click = ActionChains(self.driver)
 
-            # Click and hold the button
             action.click_and_hold(captcha_button)
             action.perform()
 
-            # Wait for the button to be fully filled
             time.sleep(10)
 
-            # Release the button
             action.release(captcha_button)
             action.perform()
 
-            # Small pause
             time.sleep(0.2)
 
-            # Release again (this might help in some cases)
             action.release(captcha_button)
             action.perform()
 
-            # Wait for the CAPTCHA to be solved and page to load
             WebDriverWait(self.driver, 15).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".FlightsTicket_container__MTI1N"))
             )
             print("CAPTCHA solved successfully!")
         except Exception as e:
             print(f"Error solving CAPTCHA: {e}")
-            # If automatic solving fails, ask for manual intervention
             input("Please solve the CAPTCHA manually and press Enter when done...")
 
     def read_website(self, origin, destination, start_date, end_date):

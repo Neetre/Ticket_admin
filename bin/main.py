@@ -13,21 +13,17 @@ class FlightSearchEngine:
         self.api_keys = {
             "skyscanner" : SKYSCANNER,
             "kayak" : KAYAK,
-            # should add more
         }
 
     def search_flights(self, origin, destination, start_date, end_date):
         results = []
-        
-        # add more API searches
+
         return sorted(results, key=lambda x: x['price'])
     
     def _search_skyscanner(self, origin, destination, date):
-        # skyscanner research
         pass
 
     def _search_kayak(self, origin, destination, date):
-        # kayak research
         pass
 
 
