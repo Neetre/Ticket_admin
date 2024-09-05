@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a simple program that scraper the skyscanner website to get the cheapest ticket for a specific destination and date.
+This is a simple program that scrapes the skyscanner website to get the cheapest ticket for a specific destination and date.
 It uses the selenium library to interact with the website and get the information.
 
 ### Note
@@ -37,6 +37,9 @@ To run the program, you need to run the following command:
 cd bin
 python scraping.py
 ```
+
+Example:
+![Example](./data/readme/flight.png)
 
 ### Note
 
